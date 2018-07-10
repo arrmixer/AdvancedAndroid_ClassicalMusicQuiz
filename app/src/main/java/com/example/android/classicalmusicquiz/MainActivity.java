@@ -16,8 +16,13 @@
 
 package com.example.android.classicalmusicquiz;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -55,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
             gameFinishedTextView.setVisibility(View.VISIBLE);
             yourScoreTextView.setVisibility(View.VISIBLE);
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel();
+        }
+
     }
 
 
@@ -65,5 +75,24 @@ public class MainActivity extends AppCompatActivity {
     public void newGame(View view) {
         Intent quizIntent = new Intent(this, QuizActivity.class);
         startActivity(quizIntent);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(getResources().getString(R.string.notification_channel_id),
+                    name, importance);
+            channel.setDescription(description);
+            channel.setShowBadge(false);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
     }
 }
